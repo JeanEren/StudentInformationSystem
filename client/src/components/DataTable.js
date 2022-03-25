@@ -67,40 +67,40 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: "ProductName",
+    id: "StudentID",
     numeric: false,
     disablePadding: true,
-    label: "Name",
+    label: "Student ID",
   },
   {
-    id: "ProductDescription",
+    id: "FullName",
     numeric: true,
     disablePadding: false,
-    label: "Description",
+    label: "Full Name",
   },
   {
-    id: "ProductStock",
+    id: "Address",
     numeric: true,
     disablePadding: false,
-    label: "Stock",
+    label: "Address",
   },
   {
-    id: "ProductUnit",
+    id: "EmailAddress",
     numeric: true,
     disablePadding: false,
-    label: "Unit",
+    label: "Email Address",
   },
   {
-    id: "ProductPrice",
+    id: "Birthday",
     numeric: true,
     disablePadding: false,
-    label: "Price",
+    label: "Birthday  ",
   },
   {
-    id: "ProductStockDate",
+    id: "Crs/Yr/Sec",
     numeric: false,
     disablePadding: false,
-    label: "Stock Date",
+    label: "Crs/Yr/Sec",
   },
   {
     id: "Action",
@@ -170,22 +170,31 @@ export default function DataTable() {
 
   const [rows, setRows] = useState([]);
 
-  const [editID,setEditID] = useState();
+  const [editRow,setEditRow] = useState();
 
-  /*
+  const [filteredRows,setFilteredRows] = useState([]) 
+  const [searchQuery,setSearchQuery] = useState('')
+
+  const requestSearch = (searchedVal) => {
+    const fRows = rows.filter((row) => {
+      return row.FirstName.toLowerCase().includes(searchedVal.toLowerCase());
+    });
+    setFilteredRows(fRows)
+  };
+  
   useEffect(() => {
     Axios.get(
-      "https://3001-jeaneren-inventorysystem-ovavb49sgnz.ws-us38.gitpod.io/api/products"
+      "https://3001-jeaneren-studentinformat-pua0avvp544.ws-us38.gitpod.io/api/students"
     ).then((res) => {
       setRows(res.data);
     });
   });
 
-  const deleteProduct = (ProductID) => {
+  const deleteStudent = (StudentID) => {
     Axios.delete(
-      `https://3001-jeaneren-inventorysystem-ovavb49sgnz.ws-us38.gitpod.io/api/product/delete/${ProductID}`
+      `https://3001-jeaneren-studentinformat-pua0avvp544.ws-us38.gitpod.io/api/student/delete/${StudentID}`
     ).then((res) => {});
-  };*/
+  };
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -230,7 +239,7 @@ export default function DataTable() {
             </IconButton>
           </Tooltip>
         </Toolbar>
-        <InputGroup style={{ paddingLeft: "20px", paddingRight: "20px" }}>
+        <InputGroup style={{ paddingLeft: "20px", paddingRight: "20px" }} onChange={(e)=>{setSearchQuery(e.targetValue);requestSearch(e.target.value)}}>
           <FormControl placeholder="Search" />
           <Button variant="contained">
             <SearchIcon />
@@ -249,7 +258,7 @@ export default function DataTable() {
               rowCount={rows.length}
             />
             <TableBody>
-              {stableSort(rows, getComparator(order, orderBy))
+              {stableSort(filteredRows.length == 0 && searchQuery == ''?rows:filteredRows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.name);
@@ -261,7 +270,7 @@ export default function DataTable() {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.ProductID}
+                      key={row.StudentID}
                       selected={isItemSelected}
                     >
                       <TableCell
@@ -270,30 +279,32 @@ export default function DataTable() {
                         scope="row"
                         align="center"
                       >
-                        {row.ProductName}
+                        {row.StudentID}
                       </TableCell>
                       <TableCell align="center">
-                        {row.ProductDescription}
+                        {row.FirstName + " " + row.MiddleName[0] + ". " + row.LastName}
                       </TableCell>
-                      <TableCell align="center">{row.ProductStock}</TableCell>
-                      <TableCell align="center">{row.ProductUnit}</TableCell>
-                      <TableCell align="center">{row.ProductPrice}</TableCell>
+                      <TableCell align="center">{row.Address}</TableCell>
+                      <TableCell align="center">{row.EmailAddress}</TableCell>
+                      <TableCell align="center">{row.Birthday}</TableCell>
                       <TableCell align="center">
-                        {row.ProductStockDate}
+                        {row.Course + " - " + row.Year + row.Section}
                       </TableCell>
                       <TableCell align="center">
-                        <Button variant="contained" onClick={()=>{
+                        <Tooltip title="Edit Data">
+                          <IconButton onClick={()=>{
                             setUpdateModalShow(true)
-                            setEditID(row.ProductID)
-                          }}> <EditIcon />Edit</Button>{" "}
-                        <Button
-                          variant="contained"
-                          onClick={() => {
-                            //deleteProduct(row.ProductID);
-                          }}
-                        >
-                          <DeleteIcon /> Delete
-                        </Button>
+                            setEditRow(row)
+                          }}>
+                            <EditIcon/>
+                          </IconButton>
+                        </Tooltip> 
+                        {" "}
+                        <Tooltip title="Delete Data">
+                          <IconButton onClick={() => {deleteStudent(row.StudentID);}}>
+                            <DeleteIcon/>
+                          </IconButton>
+                        </Tooltip> 
                       </TableCell>
                     </TableRow>
                   );
@@ -329,7 +340,7 @@ export default function DataTable() {
       <UpdateModal
         show={updateModalShow}
         onHide={() => setUpdateModalShow(false)}
-        id={editID}
+        editrow={editRow}
       />
 
     </Box>

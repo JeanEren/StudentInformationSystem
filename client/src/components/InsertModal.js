@@ -1,13 +1,48 @@
 import {Modal,Form,Col,Row} from 'react-bootstrap'
-import {Button,TextField,Typography} from '@mui/material'
+import {Button,TextField,Typography, FormControl, InputLabel, Select,MenuItem} from '@mui/material'
 
 import AdapterDateFns from '@mui/lab/AdapterDateFns'
 import {DesktopDatePicker,LocalizationProvider} from '@mui/lab';
 import {useState} from 'react'
 
+import Axios from 'axios'
+
 function InsertModal(props) {
 
-    const [value, setValue] = useState(new Date());
+    const[FirstName,setFirstName] = useState('');
+    const[MiddleName,setMiddleName] = useState('');
+    const[LastName,setLastName] = useState('');
+
+    const[Address,setAddress] = useState('');
+    const[EmailAddress,setEmailAddress] = useState('');
+
+    const[Birthday,setBirthday] = useState('');
+
+    const [Year, setYear] = useState(1);
+    const [Section,setSection] = useState('A');
+    const [Course,setCourse] = useState('BSIT');
+
+    const insertData = () =>{
+
+      Axios.post('https://3001-jeaneren-studentinformat-pua0avvp544.ws-us38.gitpod.io/api/student/insert', 
+      { 
+        FirstName:FirstName, 
+        MiddleName:MiddleName,
+        LastName:LastName,
+        Address:Address,
+        EmailAddress:EmailAddress,
+        Birthday:Birthday,
+        Year:Year,
+        Section:Section,
+        Course:Course 
+      } 
+      ).then((res) => { 
+
+        console.log(res);
+
+      }) 
+
+    }
 
     return (
       <Modal
@@ -25,25 +60,89 @@ function InsertModal(props) {
             <Typography><b>Full Name</b></Typography>
             <Row>
               <Col md={4} style={{padding:5}}>
-                <TextField variant="outlined" label="First Name" fullWidth/>
+                <TextField variant="outlined" label="First Name" fullWidth onChange={(e)=>{setFirstName(e.target.value)}}/>
               </Col>
               <Col md={4} style={{padding:5}}>
-                <TextField variant="outlined" label="Middle Name" fullWidth/>
+                <TextField variant="outlined" label="Middle Name" fullWidth onChange={(e)=>{setMiddleName(e.target.value)}}/>
               </Col>
               <Col md={4} style={{padding:5}}>
-                <TextField variant="outlined" label="Last Name" fullWidth/>
+                <TextField variant="outlined" label="Last Name" fullWidth onChange={(e)=>{setLastName(e.target.value)}}/>
               </Col>
             </Row>
             <Typography className="mt-3 mb-1"><b>Credentials</b></Typography>
             <Row>
               <Col style={{padding:5}}>
-                <TextField type="email" variant="outlined" label="Email Address" fullWidth/>
+                <TextField type="email" variant="outlined" label="Email Address" fullWidth onChange={(e)=>{setEmailAddress(e.target.value)}}/>
+              </Col>
+            </Row>
+            <Row>
+              <Col style={{padding:5}}>
+                <TextField variant="outlined" label="Address" fullWidth onChange={(e)=>{setAddress(e.target.value)}}/>
+              </Col>
+            </Row>
+            <Row>
+              <Col style={{padding:5}}>
+                <TextField type="date" defaultValue="2000-01-01" variant="outlined" label="Birthday" fullWidth onChange={(e)=>{setBirthday(e.target.value)}}/>
+              </Col>
+            </Row>
+            <Row>
+              <Col style={{padding:5}}>
+                <FormControl fullWidth>
+                  <InputLabel>Course</InputLabel>
+                  <Select
+                    value={Course}
+                    label="Course"
+                    onChange={(e)=>{setCourse(e.target.value)}}
+                  >
+                    <MenuItem value="BSIT">BSIT</MenuItem>
+                    <MenuItem value="BLIS">BLIS</MenuItem>
+                    <MenuItem value="BSCS">BSCS</MenuItem>
+                    <MenuItem value="CIT">CIT</MenuItem>
+                  </Select>
+                </FormControl>
+              </Col>
+              <Col style={{padding:5}}>
+                <FormControl fullWidth>
+                  <InputLabel>Year</InputLabel>
+                  <Select
+                    value={Year}
+                    label="Year"
+                    onChange={(e)=>{setYear(e.target.value)}}
+                  >
+                    <MenuItem value="1">1</MenuItem>
+                    <MenuItem value="2">2</MenuItem>
+                    <MenuItem value="3">3</MenuItem>
+                    <MenuItem value="4">4</MenuItem>
+                  </Select>
+                </FormControl>
+              </Col>
+              <Col style={{padding:5}}>
+                <FormControl fullWidth>
+                  <InputLabel>Section</InputLabel>
+                  <Select
+                    value={Section}
+                    label="Section"
+                    onChange={(e)=>{setSection(e.target.value)}}
+                  >
+                    <MenuItem value="A">A</MenuItem>
+                    <MenuItem value="B">B</MenuItem>
+                    <MenuItem value="C">C</MenuItem>
+                    <MenuItem value="D">D</MenuItem>
+                    <MenuItem value="E">E</MenuItem>
+                    <MenuItem value="F">F</MenuItem>
+                    <MenuItem value="G">G</MenuItem>
+                    <MenuItem value="H">H</MenuItem>
+                    <MenuItem value="I">I</MenuItem>
+                    <MenuItem value="J">J</MenuItem>
+                    <MenuItem value="K">K</MenuItem>
+                  </Select>
+                </FormControl>
               </Col>
             </Row>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="contained">Add Data</Button>
+          <Button variant="contained" onClick={insertData}>Add Data</Button>
         </Modal.Footer>
       </Modal>
     );
